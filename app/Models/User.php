@@ -95,4 +95,12 @@ class User extends Authenticatable
     {
         return $this->roles()->whereIn('tipo_rol', $roles)->exists();
     }
+    public function asignacionesComoSupervisor()
+    {
+        return $this->hasMany(Asignacion::class, 'id_supervisor', 'id_usuario');
+    }
+    public function asignacionesComoDocente()
+    {
+        return $this->hasMany(Asignacion::class, 'id_docente', 'id_usuario');
+    }
 }

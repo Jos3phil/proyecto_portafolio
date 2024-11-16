@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AsignacionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,4 +30,8 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/users/{userId}/assign-role', [UserController::class, 'showAssignRoleForm'])->name('users.showAssignRoleForm');
     Route::post('/users/{userId}/assign-role', [UserController::class, 'assignRole'])->name('users.assignRole');
+});
+Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
+    Route::get('/asignaciones/create', [AsignacionController::class, 'create'])->name('asignaciones.create');
+    Route::post('/asignaciones/store', [AsignacionController::class, 'store'])->name('asignaciones.store');
 });
