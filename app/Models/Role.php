@@ -13,10 +13,7 @@ class Role extends Model
     public $incrementing = false;
     protected $fillable = ['id_rol', 'tipo_rol', 'descripcion'];
 
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'TUsuarioRoles', 'id_rol', 'id_usuario', 'id_rol', 'id_usuario');
-    }
+    // Método para generar un id_rol único
     public static function generateRoleId()
     {
         $lastRole = self::orderBy('id_rol', 'desc')->first();
@@ -26,5 +23,11 @@ class Role extends Model
         $lastIdNumber = intval(substr($lastRole->id_rol, 1));
         $newIdNumber = $lastIdNumber + 1;
         return 'R' . str_pad($newIdNumber, 3, '0', STR_PAD_LEFT);
+    }
+
+    // Relación con el modelo User
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'TUsuarioRoles', 'id_rol', 'id_usuario', 'id_rol', 'id_usuario');
     }
 }

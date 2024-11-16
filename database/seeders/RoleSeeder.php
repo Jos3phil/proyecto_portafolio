@@ -13,7 +13,7 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-         Role::create([
+        Role::create([
             'id_rol' => Role::generateRoleId(),
             'tipo_rol' => 'DOCENTE',
             'descripcion' => 'Rol de docente',
