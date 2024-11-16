@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function showAssignRoleForm($userId)
     {
         $user = User::findOrFail($userId);
@@ -18,13 +22,20 @@ class UserController extends Controller
     {
         $user = User::findOrFail($userId);
         $role = Role::where('tipo_rol', $request->input('role'))->first();
+        $currentUser = Auth::user();      
 
-        if ($role) {
-            $idUsuarioRol = User::generateUserRoleId($userId, $role->tipo_rol);
-            $user->roles()->attach($role->id_rol, ['id_usuario_rol' => $idUsuarioRol]);
-            return response()->json(['message' => 'Rol asignado satisfactoriamente.']);
+        
+        // Verificar si el usuario autenticado es administrador o el mismo usuario
+        if ($user->hasRole('ADMINISTRADOR') || $currentUser->id_usuario === $userId) {
+            if ($role) {
+                $idUsuarioRol = User::generateUserRoleId($userId, $role->tipo_rol);
+                $user->roles()->attach($role->id_rol, ['id_usuario_rol' => $idUsuarioRol]);
+                return redirect()->route('users.showAssignRoleForm', $userId)->with('mensaje', 'Role assigned successfully.');
+            } else {
+                return redirect()->route('users.showAssignRoleForm', $userId)->withErrors(['Role not found.']);
+            }
         } else {
-            return response()->json(['message' => 'Rol no encontrado.'], 404);
+            return redirect()->route('users.showAssignRoleForm', $userId)->withErrors(['You do not have permission to assign roles.']);
         }
     }
 }

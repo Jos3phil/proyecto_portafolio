@@ -62,19 +62,11 @@ class User extends Authenticatable
                 break;
         }
 
-        $lastUserRole = DB::table('TUsuarioRoles')
-            ->where('id_usuario', $userId)
-            ->where('id_rol', $roleType)
-            ->orderBy('id_usuario_rol', 'desc')
-            ->first();
+            // Obtener el número del usuario
+        $userNumber = intval(substr($userId, 1));
 
-        if (!$lastUserRole) {
-            return $rolePrefix . '001';
-        }
-
-        $lastIdNumber = intval(substr($lastUserRole->id_usuario_rol, 2));
-        $newIdNumber = $lastIdNumber + 1;
-        return $rolePrefix . str_pad($newIdNumber, 3, '0', STR_PAD_LEFT);
+        // Generar el id_usuario_rol basado en el prefijo del rol y el número del usuario
+        return $rolePrefix . str_pad($userNumber, 3, '0', STR_PAD_LEFT);
     }
     public static function generateUserId()
     {

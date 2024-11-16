@@ -20,6 +20,6 @@ class CreateCUsuarioRolesTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('cUsuarioRoles');
+        Schema::dropIfExists('TUsuarioRoles');
     }
 }

@@ -25,5 +25,8 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
-Route::post('/users/{userId}/assign-role', [UserController::class, 'assignRole'])->name('users.assignRole');
-Route::get('/users/{userId}/assign-role', [UserController::class, 'showAssignRoleForm'])->name('users.showAssignRoleForm');
+//permite que exista un capa de seguridad en la aplicacion para acceder a ciertas rutas
+Route::middleware(['auth'])->group(function () {
+    Route::get('/users/{userId}/assign-role', [UserController::class, 'showAssignRoleForm'])->name('users.showAssignRoleForm');
+    Route::post('/users/{userId}/assign-role', [UserController::class, 'assignRole'])->name('users.assignRole');
+});
