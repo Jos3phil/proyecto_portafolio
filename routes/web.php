@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AsignacionController;
-
+use App\Http\Controllers\EvaluacionController;
+use App\Http\Controllers\CriterioEvaluacionController;
+use App\Http\Controllers\SeccionEvaluacionController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -34,4 +36,25 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
     Route::get('/asignaciones/create', [AsignacionController::class, 'create'])->name('asignaciones.create');
     Route::post('/asignaciones/store', [AsignacionController::class, 'store'])->name('asignaciones.store');
+});
+
+Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
+    Route::get('/evaluaciones', [EvaluacionController::class, 'index'])->name('evaluaciones.index');
+    Route::get('/evaluaciones/crear', [EvaluacionController::class, 'showEvaluationForm'])->name('evaluaciones.create');
+    Route::post('/evaluaciones', [EvaluacionController::class, 'storeEvaluation'])->name('evaluaciones.store');
+});
+
+Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
+    Route::get('/criterios/create', [CriterioEvaluacionController::class, 'create'])->name('criterios.create');
+    Route::post('/criterios', [CriterioEvaluacionController::class, 'store'])->name('criterios.store');
+    Route::get('/criterios', [CriterioEvaluacionController::class, 'index'])->name('criterios.index');
+    Route::get('/criterios/{id}/edit', [CriterioEvaluacionController::class, 'edit'])->name('criterios.edit');
+    Route::put('/criterios/{id}', [CriterioEvaluacionController::class, 'update'])->name('criterios.update');
+    Route::delete('/criterios/{id}', [CriterioEvaluacionController::class, 'destroy'])->name('criterios.destroy');
+});
+
+Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
+    Route::get('/secciones/create', [SeccionEvaluacionController::class, 'create'])->name('secciones.create');
+    Route::post('/secciones', [SeccionEvaluacionController::class, 'store'])->name('secciones.store');
+    Route::get('/secciones', [SeccionEvaluacionController::class, 'index'])->name('secciones.index');
 });
