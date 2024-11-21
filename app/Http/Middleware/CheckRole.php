@@ -17,20 +17,11 @@ class CheckRole
      */
     public function handle($request, Closure $next, $role)
     {
-        if (!Auth::check()) {
-            abort(403, 'No estás autenticado.');
-        }
-
-        $user = User::find(Auth::id());
-        //dd(get_class($user));
-
-    // Depuración: Verificar que $user es instancia de App\Models\User
-    // dd(get_class($user));
-
-        if (!$user->hasRole($role) || !$user) {
+        if (!Auth::user() || !Auth::user()->hasRole($role)) {
             abort(403, 'No tienes permiso para acceder a esta página.');
         }
 
         return $next($request);
     }
+
 }
