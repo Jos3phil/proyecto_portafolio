@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\CriterioEvaluacion;
 use App\Models\SeccionEvaluacion;
 use App\Models\Evaluacion;
+use App\Models\Asignacion;
 
 class EvaluacionController extends Controller
 {
@@ -33,6 +34,13 @@ class EvaluacionController extends Controller
                     ->groupBy('seccion.nombre_seccion');
 
         return view('evaluaciones.create', compact('criterios', 'tipoCurso'));
+    }
+    public function show($id)
+    {
+        $asignacion = Asignacion::with(['supervisor', 'docente', 'semestre'])->findOrFail($id);
+        $evaluaciones = Evaluacion::where('id_asignacion', $id)->with('detalles.criterio')->get();
+
+        return view('evaluaciones.show', compact('asignacion', 'evaluaciones'));
     }
     public function storeEvaluation(Request $request)
     {

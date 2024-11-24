@@ -8,6 +8,9 @@ use App\Http\Controllers\AsignacionController;
 use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\CriterioEvaluacionController;
 use App\Http\Controllers\SeccionEvaluacionController;
+
+use App\Http\Controllers\SemestreController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -36,12 +39,17 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
     Route::get('/asignaciones/create', [AsignacionController::class, 'create'])->name('asignaciones.create');
     Route::post('/asignaciones/store', [AsignacionController::class, 'store'])->name('asignaciones.store');
+    Route::get('/asignaciones', [AsignacionController::class, 'index'])->name('asignaciones.index');
+    Route::get('/asignaciones/{id}/edit', [AsignacionController::class, 'edit'])->name('asignaciones.edit');
+    Route::put('/asignaciones/{id}', [AsignacionController::class, 'update'])->name('asignaciones.update');
+    Route::delete('/asignaciones/{id}', [AsignacionController::class, 'destroy'])->name('asignaciones.destroy');
 });
 
 Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
     Route::get('/evaluaciones', [EvaluacionController::class, 'index'])->name('evaluaciones.index');
     Route::get('/evaluaciones/crear', [EvaluacionController::class, 'showEvaluationForm'])->name('evaluaciones.create');
     Route::post('/evaluaciones', [EvaluacionController::class, 'storeEvaluation'])->name('evaluaciones.store');
+    Route::get('/evaluaciones/{id}', [EvaluacionController::class, 'show'])->name('evaluaciones.show');
 });
 
 Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
@@ -57,4 +65,11 @@ Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
     Route::get('/secciones/create', [SeccionEvaluacionController::class, 'create'])->name('secciones.create');
     Route::post('/secciones', [SeccionEvaluacionController::class, 'store'])->name('secciones.store');
     Route::get('/secciones', [SeccionEvaluacionController::class, 'index'])->name('secciones.index');
+});
+
+
+Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
+    Route::get('/semestres/create', [SemestreController::class, 'create'])->name('semestres.create');
+    Route::post('/semestres', [SemestreController::class, 'store'])->name('semestres.store');
+    Route::get('/semestres', [SemestreController::class, 'index'])->name('semestres.index');
 });

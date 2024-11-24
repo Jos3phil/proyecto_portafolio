@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('TEvaluacion', function (Blueprint $table) {
             $table->string('id_evaluacion', 255)->primary();
+            $table->string('id_asignacion', 255); // Asegúrate de que esta columna esté definida
             $table->string('id_supervisor', 255);
             $table->string('id_docente', 255);
             $table->string('id_semestre', 255);
             $table->timestamp('fecha_evaluacion')->useCurrent();
             $table->timestamps();
 
+            $table->foreign('id_asignacion')->references('id_asignacion')->on('TAsignacion')->onDelete('cascade');
             $table->foreign('id_supervisor')->references('id_usuario')->on('TUsuario')->onDelete('cascade');
             $table->foreign('id_docente')->references('id_usuario')->on('TUsuario')->onDelete('cascade');
             $table->foreign('id_semestre')->references('id_semestre')->on('TSemestre')->onDelete('cascade');

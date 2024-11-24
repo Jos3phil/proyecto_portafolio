@@ -21,6 +21,11 @@ class Evaluacion extends Model
         'fecha_evaluacion',
     ];
 
+    // Relaciones
+    public function asignacion()
+    {
+        return $this->belongsTo(Asignacion::class, 'id_asignacion', 'id_asignacion');
+    }
     // Relación con el modelo Usuario para el supervisor
     public function supervisor()
     {
