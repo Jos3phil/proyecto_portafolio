@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -22,9 +21,9 @@ class UserController extends Controller
     {
         $user = User::findOrFail($userId);
         $role = Role::where('tipo_rol', $request->input('role'))->first();
-        $currentUser = Auth::user();      
+        $currentUser = Auth::user();
 
-        
+
         // Verificar si el usuario autenticado es administrador o el mismo usuario
         if ($user->hasRole('ADMINISTRADOR') || $currentUser->id_usuario === $userId) {
             if ($role) {

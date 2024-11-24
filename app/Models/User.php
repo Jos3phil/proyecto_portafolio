@@ -70,11 +70,20 @@ class User extends Authenticatable
     }
     public static function generateUserId()
     {
-        $lastUser = DB::table('TUsuario')->orderBy('id_usuario', 'desc')->first();
-        if (!$lastUser) {
+        /**
+         * Generates a new user ID based on the maximum existing user ID in the 'TUsuario' table.
+         *
+         * This function retrieves the maximum user ID from the 'TUsuario' table, increments it by one,
+         * and returns the new user ID in the format 'U' followed by a zero-padded 3-digit number.
+         * If no user ID exists in the table, it returns the initial user ID 'U001'.
+         *
+         * @return string The newly generated user ID.
+         */
+        $lastId = DB::table('TUsuario')->max('id_usuario');
+        if (!$lastId) {
             return 'U001';
         }
-        $lastIdNumber = intval(substr($lastUser->id_usuario, 1));
+        $lastIdNumber = intval(substr($lastId, 1));
         $newIdNumber = $lastIdNumber + 1;
         return 'U' . str_pad($newIdNumber, 3, '0', STR_PAD_LEFT);
     }

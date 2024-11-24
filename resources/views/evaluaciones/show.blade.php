@@ -8,6 +8,7 @@
 
     @if($evaluaciones->isEmpty())
         <p>No hay evaluaciones registradas para esta asignación.</p>
+        <a href="{{ route('evaluaciones.create', ['id_asignacion' => $asignacion->id_asignacion]) }}" class="btn btn-primary">Crear Evaluación</a>
     @else
         @foreach($evaluaciones as $evaluacion)
             <h3>Evaluación {{ $evaluacion->id_evaluacion }}</h3>

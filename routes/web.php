@@ -1,5 +1,26 @@
 <?php
 
+/**
+ * Web Routes
+ *
+ * Here is where you can register web routes for your application. These
+ * routes are loaded by the RouteServiceProvider within a group which
+ * contains the "web" middleware group. Now create something great!
+ *
+ * Routes:
+ * - GET /: Returns the welcome view.
+ * - GET /home: Calls the index method of HomeController and names the route 'home'.
+ * - GET /register: Calls the showRegistrationForm method of RegisterController and names the route 'register'.
+ * - POST /register: Calls the register method of RegisterController.
+ *
+ * Middleware:
+ * - Auth::routes(): Registers the authentication routes for the application.
+ *
+ * @file /C:/laragon/www/Proyecto_Portafolio/Proyecto_Portafolio/routes/web.php
+ * @uses \Illuminate\Support\Facades\Route
+ * @uses \Illuminate\Support\Facades\Auth
+ * @uses \App\Http\Controllers\Auth\RegisterController
+ */
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\RegisterController;
@@ -45,7 +66,7 @@ Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
     Route::delete('/asignaciones/{id}', [AsignacionController::class, 'destroy'])->name('asignaciones.destroy');
 });
 
-Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
+Route::middleware(['auth', 'role:SUPERVISOR'])->group(function () {
     Route::get('/evaluaciones', [EvaluacionController::class, 'index'])->name('evaluaciones.index');
     Route::get('/evaluaciones/crear', [EvaluacionController::class, 'showEvaluationForm'])->name('evaluaciones.create');
     Route::post('/evaluaciones', [EvaluacionController::class, 'storeEvaluation'])->name('evaluaciones.store');
