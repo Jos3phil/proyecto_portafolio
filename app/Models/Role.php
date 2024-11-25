@@ -1,5 +1,22 @@
 <?php
-
+/**
+ * Class Role
+ *
+ * This class represents the Role model which interacts with the 'TRol' table.
+ * It includes methods for generating unique role IDs and defining relationships with other models.
+ *
+ * @package App\Models
+ * @property string $id_rol The primary key for the role.
+ * @property string $tipo_rol The type of the role.
+ * @property string $descripcion The description of the role.
+ * 
+ * @method static \Illuminate\Database\Eloquent\Builder|Role newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role generateRoleId()
+ * 
+ * @mixin \Eloquent
+ */
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -16,9 +16,8 @@ class Evaluacion extends Model
     protected $fillable = [
         'id_evaluacion',
         'id_asignacion',
-        'id_supervisor',
-        'id_docente',
         'id_semestre',
+        'tipo_curso', 
         'fecha_evaluacion',
     ];
 
@@ -27,18 +26,8 @@ class Evaluacion extends Model
     {
         return $this->belongsTo(Asignacion::class, 'id_asignacion', 'id_asignacion');
     }
-    // Relación con el modelo Usuario para el supervisor
-    public function supervisor()
-    {
-        return $this->belongsTo(User::class, 'id_supervisor', 'id_usuario');
-    }
-
-    // Relación con el modelo Usuario para el docente
-    public function docente()
-    {
-        return $this->belongsTo(User::class, 'id_docente', 'id_usuario');
-    }
-
+   
+   
     // Relación con el modelo Semestre
     public function semestre()
     {
@@ -50,4 +39,32 @@ class Evaluacion extends Model
     {
         return $this->hasMany(DetalleEvaluacion::class, 'id_evaluacion', 'id_evaluacion');
     }
+     // Método para calcular el progreso
+     public function calcularProgreso()
+     {
+         // Obtener todos los criterios correspondientes al tipo de curso
+         $criterios = CriterioEvaluacion::where(function($query) {
+                             $query->where('tipo_curso', $this->tipo_curso)
+                                   ->orWhere('tipo_curso', 'AMBOS');
+                         })->get();
+ 
+         $pesoTotal = $criterios->sum('peso');
+ 
+         // Obtener los detalles de la evaluación
+         $detalles = $this->detalles;
+ 
+         // Calcular el peso acumulado
+         $pesoCumplido = 0;
+         foreach ($detalles as $detalle) {
+             $criterio = $criterios->where('id_criterio', $detalle->id_criterio)->first();
+             if ($detalle->cumple && $criterio) {
+                 $pesoCumplido += $criterio->peso;
+             }
+         }
+ 
+         // Calcular el porcentaje de progreso
+         $progreso = ($pesoCumplido / $pesoTotal) * 100;
+ 
+         return round($progreso, 2); // Redondear a 2 decimales
+     }
 }

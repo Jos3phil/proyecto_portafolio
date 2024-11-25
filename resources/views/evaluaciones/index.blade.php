@@ -22,13 +22,13 @@
             </thead>
             <tbody>
                 @foreach($evaluaciones as $evaluacion)
-                    <tr>
-                        <td>{{ $evaluacion->id_evaluacion }}</td>
-                        <td>{{ $evaluacion->supervisor->Nombre }}</td>
-                        <td>{{ $evaluacion->docente->Nombre }}</td>
-                        <td>{{ $evaluacion->semestre->nombre_semestre }}</td>
-                        <td>{{ $evaluacion->created_at }}</td>
-                    </tr>
+                <tr>
+                    <td>{{ $evaluacion->id_evaluacion }}</td>
+                    <td>{{ $evaluacion->asignacion->supervisor->Nombre ?? 'N/A' }}</td>
+                    <td>{{ $evaluacion->asignacion->docente->Nombre ?? 'N/A' }}</td>
+                    <td>{{ $evaluacion->semestre->nombre_semestre ?? 'N/A' }}</td>
+                    <td>{{ $evaluacion->created_at->format('d/m/Y') }}</td>
+                </tr>
                 @endforeach
             </tbody>
         </table>

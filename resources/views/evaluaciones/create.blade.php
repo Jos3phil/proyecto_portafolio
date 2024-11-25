@@ -6,6 +6,7 @@
 
     <!-- Formulario para seleccionar el tipo de curso -->
     <form method="GET" action="{{ route('evaluaciones.create') }}" class="mb-4">
+        <input type="hidden" name="id_asignacion" value="{{ $idAsignacion }}">
         <div class="form-group">
             <label for="tipo_curso">Tipo de Curso</label>
             <select name="tipo_curso" id="tipo_curso" class="form-control" onchange="this.form.submit()">
@@ -18,13 +19,20 @@
     <!-- Formulario para la evaluación -->
     <form method="POST" action="{{ route('evaluaciones.store') }}">
         @csrf
+        <input type="hidden" name="id_asignacion" value="{{ $idAsignacion }}">
+        <input type="hidden" name="tipo_curso" value="{{ $tipoCurso }}">
         @foreach($criterios as $nombreSeccion => $criteriosSeccion)
             <h3>{{ $nombreSeccion }}</h3>
             @foreach($criteriosSeccion as $criterio)
-                <div class="form-check">
-                    <input type="checkbox" name="criterios[{{ $criterio->id_criterio }}]" value="1" class="form-check-input" id="criterio{{ $criterio->id_criterio }}">
-                    <label class="form-check-label" for="criterio{{ $criterio->id_criterio }}">{{ $criterio->descripcion_criterio }}</label>
-                    <!-- Agregar campo para comentario si lo deseas -->
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="criterios[{{ $criterio->id_criterio }}]" value="1">
+                        {{ $criterio->descripcion_criterio }}
+                        @if($criterio->obligatorio)
+                            <span class="text-danger">*</span>
+                        @endif
+                        (Peso: {{ $criterio->peso }})
+                    </label>
                     <input type="text" name="comentarios[{{ $criterio->id_criterio }}]" class="form-control" placeholder="Comentario opcional">
                 </div>
             @endforeach

@@ -12,6 +12,8 @@
     @else
         @foreach($evaluaciones as $evaluacion)
             <h3>Evaluación {{ $evaluacion->id_evaluacion }}</h3>
+            <p><strong>Progreso:</strong> {{ $evaluacion->calcularProgreso()  }}%</p>
+        
             <table class="table">
                 <thead>
                     <tr>

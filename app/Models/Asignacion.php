@@ -56,6 +56,10 @@ class Asignacion extends Model
     {
         return $this->belongsTo(Semestre::class, 'id_semestre', 'id_semestre');
     }
+    public function evaluaciones()
+    {
+        return $this->hasMany(Evaluacion::class, 'id_asignacion', 'id_asignacion');
+    }
     // Función para generar el identificador único
     public static function generateId()
     {
