@@ -67,10 +67,16 @@ Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:SUPERVISOR'])->group(function () {
-    Route::get('/evaluaciones', [EvaluacionController::class, 'index'])->name('evaluaciones.index');
-    Route::get('/evaluaciones/crear', [EvaluacionController::class, 'showEvaluationForm'])->name('evaluaciones.create');
-    Route::post('/evaluaciones', [EvaluacionController::class, 'storeEvaluation'])->name('evaluaciones.store');
-    Route::get('/evaluaciones/{id}', [EvaluacionController::class, 'show'])->name('evaluaciones.show');
+    Route::controller(EvaluacionController::class)->group(function () {
+        Route::get('/evaluaciones', 'index')->name('evaluaciones.index');
+        Route::get('/evaluaciones/create', 'create')->name('evaluaciones.create'); // Usando /create en lugar de /crear
+        Route::post('/evaluaciones', 'store')->name('evaluaciones.store');
+        Route::get('/evaluaciones/{idAsignacion}', 'show')->name('evaluaciones.show');
+        Route::get('/evaluaciones/{idEvaluacion}/detail', 'detail')->name('evaluaciones.detail');
+        Route::delete('/evaluaciones/{idEvaluacion}', 'destroy')->name('evaluaciones.destroy');
+        Route::get('/evaluaciones/{idEvaluacion}/continuar', 'continueEvaluation')->name('evaluaciones.continue');
+        Route::post('/evaluaciones/continuar', 'storeContinuation')->name('evaluaciones.storeContinuation');
+    });
 });
 
 Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {

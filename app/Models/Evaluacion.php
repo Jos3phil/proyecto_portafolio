@@ -67,4 +67,38 @@ class Evaluacion extends Model
  
          return round($progreso, 2); // Redondear a 2 decimales
      }
+    
+    public function calcularProgresoTotal()
+    {
+        // Obtener todas las evaluaciones de la asignación y tipo de curso
+        $evaluaciones = Evaluacion::where('id_asignacion', $this->id_asignacion)
+            ->where('tipo_curso', $this->tipo_curso)
+            ->with('detalles')
+            ->get();
+
+        // Obtener todos los criterios correspondientes
+        $criterios = CriterioEvaluacion::where(function($query) {
+            $query->where('tipo_curso', $this->tipo_curso)
+                ->orWhere('tipo_curso', 'AMBOS');
+        })->get();
+
+        $pesoTotal = $criterios->sum('peso');
+
+        // Criterios cumplidos en todas las evaluaciones
+        $criteriosCumplidosIds = [];
+
+        foreach ($evaluaciones as $evaluacion) {
+            foreach ($evaluacion->detalles as $detalle) {
+                if ($detalle->cumple && !in_array($detalle->id_criterio, $criteriosCumplidosIds)) {
+                    $criteriosCumplidosIds[] = $detalle->id_criterio;
+                }
+            }
+        }
+
+        $pesoCumplido = $criterios->whereIn('id_criterio', $criteriosCumplidosIds)->sum('peso');
+
+        $progreso = ($pesoCumplido / $pesoTotal) * 100;
+
+        return round($progreso, 2);
+    }
 }
