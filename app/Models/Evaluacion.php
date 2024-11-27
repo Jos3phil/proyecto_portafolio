@@ -19,6 +19,7 @@ class Evaluacion extends Model
         'id_semestre',
         'tipo_curso', 
         'fecha_evaluacion',
+        'progreso',
     ];
 
     // Relaciones
@@ -70,34 +71,44 @@ class Evaluacion extends Model
     
     public function calcularProgresoTotal()
     {
+        /*
+        Obtener los criterios correspondientes: Se obtienen todos los criterios que aplican al tipo de curso o a "AMBOS".
+        Calcular el peso total: Se suma el peso de todos los criterios obtenidos.
+        Obtener todas las evaluaciones anteriores: Se obtienen todas las evaluaciones para la asignación y tipo de curso específicos.
+        Obtener los detalles de las evaluaciones: Se obtienen todos los DetalleEvaluacion asociados a las evaluaciones anteriores.
+        Obtener los IDs únicos de los criterios evaluados: Se extraen los IDs de criterios evaluados sin duplicados.
+        Calcular el peso cumplido: Se suma el peso de los criterios evaluados.
+        Calcular el progreso: Se calcula el porcentaje del peso cumplido respecto al peso total.
+        */
+        $idAsignacion = $this->id_asignacion;
+        $tipoCurso = $this->tipo_curso;
         // Obtener todas las evaluaciones de la asignación y tipo de curso
-        $evaluaciones = Evaluacion::where('id_asignacion', $this->id_asignacion)
-            ->where('tipo_curso', $this->tipo_curso)
-            ->with('detalles')
-            ->get();
+        $evaluaciones = Evaluacion::where('id_asignacion', $idAsignacion)
+            ->where('tipo_curso',$tipoCurso)
+            ->where('fecha_evaluacion', '<=', $this->fecha_evaluacion)
+            ->pluck('id_evaluacion');
 
         // Obtener todos los criterios correspondientes
-        $criterios = CriterioEvaluacion::where(function($query) {
-            $query->where('tipo_curso', $this->tipo_curso)
+        $criterios = CriterioEvaluacion::where(function($query) use ($tipoCurso) {
+            $query->where('tipo_curso', $tipoCurso)
                 ->orWhere('tipo_curso', 'AMBOS');
         })->get();
 
-        $pesoTotal = $criterios->sum('peso');
+        $totalPeso = $criterios->sum('peso');
 
-        // Criterios cumplidos en todas las evaluaciones
-        $criteriosCumplidosIds = [];
+        // Obtener los detalles de todas las evaluaciones
+        $detalles = DetalleEvaluacion::whereIn('id_evaluacion', $evaluaciones)->get();
 
-        foreach ($evaluaciones as $evaluacion) {
-            foreach ($evaluacion->detalles as $detalle) {
-                if ($detalle->cumple && !in_array($detalle->id_criterio, $criteriosCumplidosIds)) {
-                    $criteriosCumplidosIds[] = $detalle->id_criterio;
-                }
-            }
-        }
-
+        // Obtener los IDs únicos de los criterios evaluados que cumplen
+        $criteriosCumplidosIds = DetalleEvaluacion::whereIn('id_evaluacion', $evaluaciones)
+        ->pluck('id_criterio')
+        ->unique()
+        ->toArray();
+        // Sumar el peso de los criterios cumplidos
         $pesoCumplido = $criterios->whereIn('id_criterio', $criteriosCumplidosIds)->sum('peso');
 
-        $progreso = ($pesoCumplido / $pesoTotal) * 100;
+        // Calcular el progreso
+        $progreso = ($totalPeso > 0) ? ($pesoCumplido / $totalPeso) * 100:0;
 
         return round($progreso, 2);
     }

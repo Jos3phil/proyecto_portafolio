@@ -133,36 +133,21 @@ class EvaluacionController extends Controller
             'tipo_curso' => 'required|in:TEORIA,PRACTICA',
             'criterios' => 'required|array',
         ]);
-        /*
-        $criteriosObligatorios = CriterioEvaluacion::where('obligatoriedad', true)
-                ->where(function($query) use ($request) {
-                    $query->where('tipo_curso', $request->tipo_curso)
-                        ->orWhere('tipo_curso', 'AMBOS');
-                })
-                ->pluck('id_criterio')->toArray();
+        $idAsignacion = $request->input('id_asignacion');
+        $tipoCurso = $request->input('tipo_curso');
+        // Obtener la asignación
+        $asignacion = Asignacion::with('semestre')->findOrFail($request->id_asignacion);
+        $idSemestre = $asignacion->id_semestre;
 
-        // Verificar que todos los criterios obligatorios han sido marcados
-        $criteriosSeleccionados = array_keys($request->criterios);
-        $faltantes = array_diff($criteriosObligatorios, $criteriosSeleccionados);
-
-        if (count($faltantes) > 0) {
-            return redirect()->back()->withErrors(['Debe evaluar todos los criterios obligatorios.'])->withInput();
-        }
-            */
-            // Obtener la asignación
-            $asignacion = Asignacion::with('semestre')->findOrFail($request->id_asignacion);
-
-        // Generar un ID único para la evaluación
+        // Obtener la asignación con el semestre
         $idEvaluacion = 'E' . time();
         $fechaFin = $asignacion->semestre->fecha_fin;
-
-         // Obtener la fecha actual
         $fechaActual = now();
 
         // Obtener los criterios obligatorios
         $criteriosObligatorios = CriterioEvaluacion::where('obligatoriedad', true)
-        ->where(function($query) use ($request) {
-            $query->where('tipo_curso', $request->tipo_curso)
+        ->where(function($query) use ($tipoCurso) {
+            $query->where('tipo_curso', $tipoCurso)
                 ->orWhere('tipo_curso', 'AMBOS');
         })
         ->pluck('id_criterio')
@@ -190,35 +175,58 @@ class EvaluacionController extends Controller
 
         // Si la fecha actual ha pasado la fecha_fin, exigir que no queden faltantes
         if ($fechaActual->gt($fechaFin) && count($faltantes) > 0) {
-            return redirect()->back()->withErrors(['Debe evaluar todos los criterios obligatorios antes de la fecha límite.'])->withInput();
+            //return redirect()->back()->withErrors(['Debe evaluar todos los criterios obligatorios antes de la fecha límite.'])->withInput();
+            $mensajeError = 'La fecha límite para completar los criterios obligatorios ha expirado y no se han evaluado todos los criterios obligatorios.';
+
+            // Reobtener los criterios para la vista
+            $criterios = CriterioEvaluacion::where(function($query) use ($tipoCurso) {
+                    $query->where('tipo_curso', $tipoCurso)
+                        ->orWhere('tipo_curso', 'AMBOS');
+                })
+                ->with('seccion')
+                ->get()
+                ->groupBy('seccion.nombre_seccion');
+
+            // Devolver a la vista 'create' con errores y variables necesarias
+            return redirect()->back()
+                ->withErrors([$mensajeError])
+                ->withInput($request->all())
+                ->with([
+                    'asignacion' => $asignacion,
+                    'criterios' => $criterios,
+                    'tipoCurso' => $tipoCurso,
+                    'idAsignacion' => $idAsignacion,
+                ]);
         }
         // Crear la nueva evaluación
         $idEvaluacion = 'E' . time();
 
         $evaluacion = Evaluacion::create([
             'id_evaluacion' => $idEvaluacion,
-            'id_asignacion' => $request->id_asignacion,
-            'id_semestre' => $asignacion->id_semestre,
-            'fecha_evaluacion' => $fechaActual,
-            'tipo_curso' => $request->tipo_curso,
+            'id_asignacion' => $idAsignacion,
+            'id_semestre' => $idSemestre,
+            'tipo_curso' => $tipoCurso,
+            'fecha_evaluacion' => now(),
         ]);
         
-        foreach ($request->criterios as $idCriterio => $cumple) {
-            $evaluacion->detalles()->create([
+        // Guardar los detalles de la evaluación
+        foreach ($criteriosSeleccionados as $idCriterio) {
+            DetalleEvaluacion::create([
+                'id_evaluacion' => $idEvaluacion,
                 'id_criterio' => $idCriterio,
-                'cumple' => $cumple,
+                'cumple' => true,
                 'comentario' => $request->comentarios[$idCriterio] ?? null,
             ]);
         }
 
         // Calcular el progreso total
-        $progreso = $evaluacion->calcularProgresoTotal();
+        //$progreso = $evaluacion->calcularProgresoTotal();
 
         // Actualizar el progreso en la evaluación (si es necesario)
-        $evaluacion->progreso = $progreso;
-        $evaluacion->save();
+        //$evaluacion->progreso = $progreso;
+        //$evaluacion->save();
 
-        return redirect()->route('evaluaciones.show', $request->id_asignacion)
+        return redirect()->route('evaluaciones.show', $idAsignacion)
                          ->with('mensaje', 'Evaluación creada exitosamente.');
     }
     public function continueEvaluation($idEvaluacion)
@@ -264,9 +272,14 @@ class EvaluacionController extends Controller
             'id_evaluacion_anterior' => 'required|exists:TEvaluacion,id_evaluacion',
         ]);
 
+        $idAsignacion = $request->input('id_asignacion');
+        $tipoCurso = $request->input('tipo_curso');
+
         $evaluacionAnterior = Evaluacion::findOrFail($request->id_evaluacion_anterior);
         $asignacion = $evaluacionAnterior->asignacion;
+        $idSemestre = $asignacion->id_semestre;
         $fechaFin = $asignacion->semestre->fecha_fin;
+        $fechaActual = now();
 
         // Verificar si la fecha límite ha pasado
         if (now()->gt($fechaFin)) {
@@ -274,76 +287,110 @@ class EvaluacionController extends Controller
         }
         // Obtener los criterios obligatorios
         $criteriosObligatorios = CriterioEvaluacion::where('obligatoriedad', true)
-            ->where(function($query) use ($request) {
-                $query->where('tipo_curso', $request->tipo_curso)
+            ->where(function($query) use ($tipoCurso) {
+                $query->where('tipo_curso', $tipoCurso)
                     ->orWhere('tipo_curso', 'AMBOS');
             })
             ->pluck('id_criterio')
             ->toArray();
 
-        
-        // Obtener los criterios obligatorios
-        $criteriosObligatorios = CriterioEvaluacion::where('obligatoriedad', true)
-        ->where(function($query) use ($request) {
-            $query->where('tipo_curso', $request->tipo_curso)
-                ->orWhere('tipo_curso', 'AMBOS');
-        })
-        ->pluck('id_criterio')
-        ->toArray();
-        // Criterios cumplidos hasta ahora (incluyendo evaluaciones anteriores)
-        $criteriosCumplidos = DetalleEvaluacion::whereIn('id_evaluacion', function($query) use ($request) {
-            $query->select('id_evaluacion')
-                ->from('TEvaluacion')
-                ->where('id_asignacion', $request->id_asignacion)
-                ->where('tipo_curso', $request->tipo_curso);
-        })
-            ->where('cumple', true)
+        // Obtener los IDs de todas las evaluaciones anteriores para la misma asignación y tipo de curso
+        $evaluacionesAnteriores = Evaluacion::where('id_asignacion', $idAsignacion)
+        ->where('tipo_curso', $tipoCurso)
+        ->pluck('id_evaluacion');
+
+        // Obtener los criterios ya evaluados en evaluaciones anteriores
+        $criteriosEvaluados = DetalleEvaluacion::whereIn('id_evaluacion', $evaluacionesAnteriores)
             ->pluck('id_criterio')
             ->toArray();
         // Criterios seleccionados en esta evaluación
         $criteriosSeleccionados = array_keys($request->criterios);
-
+        
+         // Verificar que no se estén evaluando criterios ya evaluados
+        $criteriosDuplicados = array_intersect($criteriosEvaluados, $criteriosSeleccionados);
+        if (count($criteriosDuplicados) > 0) {
+            $mensajeError = 'Algunos criterios ya han sido evaluados previamente.';
+    
+            // Reobtener los criterios para la vista
+            $criterios = CriterioEvaluacion::where(function($query) use ($tipoCurso) {
+                    $query->where('tipo_curso', $tipoCurso)
+                          ->orWhere('tipo_curso', 'AMBOS');
+                })
+                ->with('seccion')
+                ->get()
+                ->groupBy('seccion.nombre_seccion');
+    
+            return redirect()->back()
+                ->withErrors([$mensajeError])
+                ->withInput($request->all())
+                ->with([
+                    'criterios' => $criterios,
+                    'tipoCurso' => $tipoCurso,
+                    'idAsignacion' => $idAsignacion,
+                    'evaluacionAnterior' => $evaluacionAnterior,
+                    'criteriosEvaluados' => $criteriosEvaluados,
+                    'fechaFin' => $fechaFin,
+                ]);
+        }
         // Total de criterios cumplidos
-        $criteriosTotalCumplidos = array_unique(array_merge($criteriosCumplidos, $criteriosSeleccionados));
+        $criteriosTotalCumplidos = array_unique(array_merge($criteriosEvaluados, $criteriosSeleccionados));
 
         // Faltantes por cumplir
         $faltantes = array_diff($criteriosObligatorios, $criteriosTotalCumplidos);
 
         // Si la fecha actual ha pasado la fecha_fin y faltan criterios obligatorios
-        if (now()->gt($fechaFin) && count($faltantes) > 0) {
-            return redirect()->back()->withErrors(['Debe evaluar todos los criterios obligatorios antes de la fecha límite.'])->withInput();
-        }
+        if ($fechaActual->gt($fechaFin) && count($faltantes) > 0) {
+            $mensajeError = 'La fecha límite para completar los criterios obligatorios ha expirado y no se han evaluado todos los criterios obligatorios.';
 
-        // Crear la nueva evaluación
-        $idEvaluacion = 'E' . time();
-
-        $evaluacion = Evaluacion::create([
-            'id_evaluacion' => $idEvaluacion,
-            'id_asignacion' => $request->id_asignacion,
-            'id_semestre' => $asignacion->id_semestre,
-            'fecha_evaluacion' => now(),
-            'tipo_curso' => $request->tipo_curso,
-        ]);
+            // Reobtener los criterios para la vista
+            $criterios = CriterioEvaluacion::where(function($query) use ($tipoCurso) {
+                    $query->where('tipo_curso', $tipoCurso)
+                          ->orWhere('tipo_curso', 'AMBOS');
+                })
+                ->with('seccion')
+                ->get()
+                ->groupBy('seccion.nombre_seccion');
+    
+            return redirect()->back()
+                ->withErrors([$mensajeError])
+                ->withInput($request->all())
+                ->with([
+                    'criterios' => $criterios,
+                    'tipoCurso' => $tipoCurso,
+                    'idAsignacion' => $idAsignacion,
+                    'evaluacionAnterior' => $evaluacionAnterior,
+                    'criteriosEvaluados' => $criteriosEvaluados,
+                    'fechaFin' => $fechaFin,
+                ]);
+            }
+            // Crear nueva evaluación de continuación
+            $evaluacion = Evaluacion::create([
+                'id_evaluacion' => 'E' . time(),
+                'id_asignacion' => $idAsignacion,
+                'id_semestre' => $idSemestre, 
+                'tipo_curso' => $tipoCurso,
+                'fecha_evaluacion' => now(),
+            ]);
 
         // Guardar los detalles de la evaluación
-        foreach ($request->criterios as $idCriterio => $cumple) {
-            $evaluacion->detalles()->create([
+        foreach ($criteriosSeleccionados as $idCriterio) {
+            DetalleEvaluacion::create([
+                'id_evaluacion' => $evaluacion->id_evaluacion,
                 'id_criterio' => $idCriterio,
-                'cumple' => $cumple,
+                'cumple' => true, // Agregar este campo
                 'comentario' => $request->comentarios[$idCriterio] ?? null,
             ]);
         }
 
-        // Calcular el progreso total
-        $progreso = $evaluacion->calcularProgresoTotal();
+         // Calcular el progreso total
+        $progresoTotal = $evaluacion->calcularProgresoTotal();
 
-        // Actualizar el progreso en la evaluación (si es necesario)
-        $evaluacion->progreso = $progreso;
+        // Actualizar el progreso en la evaluación actual
+        $evaluacion->progreso = $progresoTotal;
         $evaluacion->save();
 
-        // Redirigir con mensaje de éxito
-        return redirect()->route('evaluaciones.show', $request->id_asignacion)
-                        ->with('mensaje', 'Evaluación continuada creada exitosamente.');
+        return redirect()->route('evaluaciones.show', $idAsignacion)
+            ->with('success', 'Evaluación continuada guardada exitosamente.');
     }
     public function destroy($idEvaluacion)
     {

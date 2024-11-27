@@ -8,12 +8,15 @@
 
     @include('partials.info')
     @include('partials.error')
-
-    <p><strong>Fecha Límite:</strong> {{ \Carbon\Carbon::parse($asignacion->semestre->fecha_fin)->format('d/m/Y') }}</p>
-
+    <!-- Comprobar si existe la variable $asignacion -->
+    @if(isset($asignacion))
+        <p><strong>Fecha Límite:</strong> {{ \Carbon\Carbon::parse($asignacion->semestre->fecha_fin)->format('d/m/Y') }}</p>
+    @endif
     <!-- Formulario para seleccionar el tipo de curso -->
+     
+    
     <form method="GET" action="{{ route('evaluaciones.create') }}">
-        <input type="hidden" name="id_asignacion" value="{{ $idAsignacion }}">
+        <input type="hidden" name="id_asignacion" value="{{ $idAsignacion ?? old('id_asignacion') }}">
         <div class="form-group">
             <label for="tipo_curso">Tipo de Curso</label>
             <select name="tipo_curso" id="tipo_curso" class="form-control" onchange="this.form.submit()">
@@ -26,8 +29,8 @@
     <!-- Formulario para crear la evaluación -->
     <form method="POST" action="{{ route('evaluaciones.store') }}">
         @csrf
-        <input type="hidden" name="id_asignacion" value="{{ $idAsignacion }}">
-        <input type="hidden" name="tipo_curso" value="{{ $tipoCurso }}">
+        <input type="hidden" name="id_asignacion" value="{{ $idAsignacion ?? old('id_asignacion') }}">
+        <input type="hidden" name="tipo_curso" value="{{ $tipoCurso ?? old('tipo_curso') }}">
 
         @foreach($criterios as $nombreSeccion => $criteriosSeccion)
             <h3>{{ $nombreSeccion }}</h3>

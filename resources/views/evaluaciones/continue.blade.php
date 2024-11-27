@@ -5,8 +5,10 @@
     <h1>Continuar Evaluación</h1>
     <p><strong>Asignación:</strong> {{ $idAsignacion }}</p>
     <p><strong>Tipo de Curso:</strong> {{ $tipoCurso }}</p>
-    <p><strong>Fecha Límite:</strong> {{ \Carbon\Carbon::parse($evaluacionAnterior->asignacion->semestre->fecha_fin)->format('d/m/Y') }}</p>
-
+    <!-- Comprobar si existe la variable $fechaFin -->
+    @if(isset($fechaFin))
+        <p><strong>Fecha Límite:</strong> {{ \Carbon\Carbon::parse($fechaFin)->format('d/m/Y') }}</p>
+    @endif
     @include('partials.info')
     @include('partials.error')
 

@@ -20,10 +20,13 @@
                     <div class="card-body">
                         <p><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($evaluacion->fecha_evaluacion)->format('d/m/Y') }}</p>
                         <p><strong>Tipo de Curso:</strong> {{ $evaluacion->tipo_curso }}</p>
-                        <p><strong>Progreso:</strong> {{ $evaluacion->calcularProgreso() }}%</p>
-                        <p><strong>Estado:</strong> {{ $evaluacion->calcularProgreso() == 100 ? 'Completa' : 'En Progreso' }}</p>
+                        @php
+                        $progresoTotal = $evaluacion->calcularProgresoTotal();
+                        @endphp
+                        <p><strong>Progreso Acumulado:</strong> {{ $progresoTotal }}%</p>
+                        <p><strong>Estado:</strong> {{ $progresoTotal == 100 ? 'Completa' : 'En Progreso' }}</p>
                         <!-- Botón "Continuar Evaluación" si el progreso es menor al 100% y dentro del plazo -->
-                        @if($evaluacion->calcularProgresoTotal() < 100 && now()->lte($asignacion->semestre->fecha_fin))
+                        @if($progresoTotal < 100 && now()->lte($asignacion->semestre->fecha_fin))
                             <a href="{{ route('evaluaciones.continue', ['idEvaluacion' => $evaluacion->id_evaluacion]) }}" class="btn btn-warning">Continuar Evaluación</a>
                         @endif
                          <!-- Botón para ver detalles -->
