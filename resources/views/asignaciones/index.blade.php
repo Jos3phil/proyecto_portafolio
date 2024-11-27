@@ -1,8 +1,13 @@
-@extends('layouts.app')
+@extends('adminlte::page')
+
+@section('title', 'Asignaciones')
+
+@section('content_header')
+    <h1>Listado de Asignaciones</h1>
+@stop
 
 @section('content')
 <div class="container">
-    <h1>Lista de Asignaciones</h1>
     @include('partials.info')
 
     <a href="{{ route('asignaciones.create') }}" class="btn btn-success mb-3">Crear Nueva Asignación</a>

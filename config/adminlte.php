@@ -327,17 +327,37 @@ return [
             'label' => 4,
             'label_color' => 'success',
         ],
-        ['header' => 'account_settings'],
+        ['header' => 'Navegación'],
         [
-            'text' => 'profile',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
+            'text' => 'asignaciones',
+            'url' => '/asignaciones',
+            'icon' => 'fas fa-project-diagram',
+            'can' => 'admin-access',
         ],
         [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
+            'text' => 'Evaluaciones',
+            'url'  => '/evaluaciones',
             'icon' => 'fas fa-fw fa-lock',
+            'can'  => 'supervisor-access', // Opcional: Mostrar solo para supervisores
         ],
+        [
+            'text' => 'Criterios de Evaluación',
+            'url'  => '/criterios',
+            'icon' => 'fas fa-edit',
+            'can'  => 'admin-access',
+        ],
+        [
+            'text' => 'Secciones de Evaluación',
+            'url'  => '/secciones',
+            'icon' => 'fas fa-columns',
+            'can'  => 'admin-access',
+        ],
+        [
+            'text' => 'Semestres',
+            'url'  => '/semestres',
+            'icon' => 'fas fa-calendar-alt',
+            'can'  => 'admin-access',
+        ],        
         [
             'text' => 'multilevel',
             'icon' => 'fas fa-fw fa-share',
