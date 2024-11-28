@@ -1,10 +1,6 @@
-@extends('adminlte::page')
+@extends('layouts.master')
 
-@section('title', 'Asignaciones')
-
-@section('content_header')
-    <h1>Listado de Asignaciones</h1>
-@stop
+@section('page_title', 'Asignaciones')
 
 @section('content')
 <div class="container">
