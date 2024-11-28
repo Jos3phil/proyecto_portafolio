@@ -12,6 +12,11 @@ class UserController extends Controller
     {
         $this->middleware('auth');
     }
+    public function index()
+    {
+        $users = User::with('roles')->get(); // Carga los roles relacionados
+        return view('users.index', compact('users'));
+    }
     public function showAssignRoleForm($userId)
     {
         $user = User::findOrFail($userId);
@@ -25,7 +30,7 @@ class UserController extends Controller
 
 
         // Verificar si el usuario autenticado es administrador o el mismo usuario
-        if ($user->hasRole('ADMINISTRADOR') || $currentUser->id_usuario === $userId) {
+        if ($currentUser->hasRole('ADMINISTRADOR') || $currentUser->id_usuario === $userId) {
             if ($role) {
                 $idUsuarioRol = User::generateUserRoleId($userId, $role->tipo_rol);
                 $user->roles()->attach($role->id_rol, ['id_usuario_rol' => $idUsuarioRol]);

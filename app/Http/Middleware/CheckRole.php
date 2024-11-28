@@ -17,8 +17,16 @@ class CheckRole
      */
     public function handle($request, Closure $next, $role)
     {
-        if (!Auth::user() || !Auth::user()->hasRole($role)) {
-            abort(403, 'No tienes permiso para acceder a esta página.');
+        if (!Auth::check()) {
+            // No está autenticado
+            return redirect('/login');
+        }
+
+        $user = Auth::user();
+
+        if (!$user->hasRole($role)) {
+            // No tiene el rol requerido
+            abort(403, 'No tienes permisos para acceder a esta página.');
         }
 
         return $next($request);

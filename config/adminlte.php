@@ -357,7 +357,13 @@ return [
             'url'  => '/semestres',
             'icon' => 'fas fa-calendar-alt',
             'can'  => 'admin-access',
-        ],        
+        ],
+        [
+            'text' => 'usuarios',
+            'url'  => '/users',
+            'icon' => 'fas fa-calendar-alt',
+            'can'  => 'admin-access',
+        ],      
         [
             'text' => 'multilevel',
             'icon' => 'fas fa-fw fa-share',

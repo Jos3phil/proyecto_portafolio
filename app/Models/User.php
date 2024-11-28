@@ -93,7 +93,9 @@ class User extends Authenticatable
     }
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'TUsuarioRoles', 'id_usuario', 'id_rol', 'id_usuario', 'id_rol');
+        return $this->belongsToMany(Role::class, 'TUsuarioRoles', 'id_usuario', 'id_rol')
+                    ->withPivot('id_usuario_rol')
+                    ->withTimestamps();
     }   
     public function hasRole($roleType)
     {
@@ -104,12 +106,19 @@ class User extends Authenticatable
     {
         return $this->roles()->whereIn('tipo_rol', $roles)->exists();
     }
-    public function asignacionesComoSupervisor()
+    /**
+     * Relación uno a muchos con Asignacion (como supervisor)
+     */
+    public function asignaciones()
     {
-        return $this->hasMany(Asignacion::class, 'id_supervisor', 'id_usuario');
+        return $this->hasMany(Asignacion::class, 'supervisor_id', 'id_usuario');
     }
-    public function asignacionesComoDocente()
+    /**
+     * Relación muchos a través con User (docentes asignados)
+     */
+    public function docentesAsignados()
     {
-        return $this->hasMany(Asignacion::class, 'id_docente', 'id_usuario');
+        return $this->hasManyThrough(User::class, Asignacion::class, 'id_supervisor', 'id_usuario', 'id_usuario', 'id_docente');
     }
+
 }

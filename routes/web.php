@@ -53,7 +53,8 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 //permite que exista un capa de seguridad en la aplicacion para acceder a ciertas rutas
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth','role:ADMINISTRADOR'])->group(function () {
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');    
     Route::get('/users/{userId}/assign-role', [UserController::class, 'showAssignRoleForm'])->name('users.showAssignRoleForm');
     Route::post('/users/{userId}/assign-role', [UserController::class, 'assignRole'])->name('users.assignRole');
 });
@@ -67,6 +68,7 @@ Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:SUPERVISOR'])->group(function () {
+    Route::get('/supervisor/docentes', [AsignacionController::class, 'tusDocentes'])->name('supervisor.docentes');
     Route::controller(EvaluacionController::class)->group(function () {
         Route::get('/evaluaciones', 'index')->name('evaluaciones.index');
         Route::get('/evaluaciones/create', 'create')->name('evaluaciones.create'); // Usando /create en lugar de /crear

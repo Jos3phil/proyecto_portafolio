@@ -45,6 +45,8 @@ class Role extends Model
     // Relación con el modelo User
     public function users()
     {
-        return $this->belongsToMany(User::class, 'TUsuarioRoles', 'id_rol', 'id_usuario', 'id_rol', 'id_usuario');
+        return $this->belongsToMany(User::class, 'TUsuarioRoles', 'id_rol', 'id_usuario')
+                    ->withPivot('id_usuario_rol')
+                    ->withTimestamps();
     }
 }

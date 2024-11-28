@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Asignacion;
 use App\Models\Semestre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AsignacionController extends Controller
 {
@@ -93,6 +94,23 @@ class AsignacionController extends Controller
         return redirect()->route('asignaciones.index')->with('mensaje', 'Asignación actualizada exitosamente.');
     }
 
+    /**
+     * Mostrar los docentes asignados al supervisor autenticado
+     */
+    public function tusDocentes()
+    {
+        $supervisor = Auth::user();
+
+        // Verificar que el usuario tenga el rol de SUPERVISOR
+        if (!$supervisor->hasRole('SUPERVISOR')) {
+            abort(403, 'No tienes permisos para acceder a esta página.');
+        }
+
+        // Obtener los docentes asignados
+        $docentes = $supervisor->docentesAsignados()->with('roles')->get();
+
+        return view('asignaciones.tus_docentes', compact('docentes'));
+    }
     public function destroy($id)
     {
         $asignacion = Asignacion::findOrFail($id);
