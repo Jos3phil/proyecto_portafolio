@@ -2,47 +2,47 @@
 
 @section('content')
 <div class="container">
-    <h1>Evaluaciones de la Asignación {{ $asignacion->id_asignacion }}</h1>
-    <p><strong>Docente:</strong> {{ $asignacion->docente->Nombre ?? 'N/A' }}</p>
-    <p><strong>Supervisor:</strong> {{ $asignacion->supervisor->Nombre ?? 'N/A' }}</p>
-    <p><strong>Semestre:</strong> {{ $asignacion->semestre->nombre_semestre ?? 'N/A' }}</p>
+    <h1>Detalle de Evaluación: {{ $evaluacion->id_evaluacion }}</h1>
 
-    @include('partials.info')
-    @include('partials.error')
-    <a href="{{ route('evaluaciones.create', ['id_asignacion' => $asignacion->id_asignacion]) }}" class="btn btn-success mb-3">Nueva Evaluación</a>
-    <div class="row">
-        @forelse($evaluaciones as $index => $evaluacion)
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Evaluación {{ $index + 1 }}</h5>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($evaluacion->fecha_evaluacion)->format('d/m/Y') }}</p>
-                        <p><strong>Tipo de Curso:</strong> {{ $evaluacion->tipo_curso }}</p>
-                        @php
-                        $progresoTotal = $evaluacion->calcularProgresoTotal();
-                        @endphp
-                        <p><strong>Progreso Acumulado:</strong> {{ $progresoTotal }}%</p>
-                        <p><strong>Estado:</strong> {{ $progresoTotal == 100 ? 'Completa' : 'En Progreso' }}</p>
-                        <!-- Botón "Continuar Evaluación" si el progreso es menor al 100% y dentro del plazo -->
-                        @if($progresoTotal < 100 && now()->lte($asignacion->semestre->fecha_fin))
-                            <a href="{{ route('evaluaciones.continue', ['idEvaluacion' => $evaluacion->id_evaluacion]) }}" class="btn btn-warning">Continuar Evaluación</a>
-                        @endif
-                         <!-- Botón para ver detalles -->
-                        <a href="{{ route('evaluaciones.detail', ['idEvaluacion' => $evaluacion->id_evaluacion]) }}" class="btn btn-primary">Ver Detalles</a>
-                        <!-- Botón para eliminar -->
-                        <form action="{{ route('evaluaciones.destroy', $evaluacion->id_evaluacion) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta evaluación?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                        </form>
-                    </div>
-                </div>                
-            </div>
-        @empty
-            <p>no hay evaluaciones disponibles.</p>
-        @endforelse        
+    <div class="card mb-4">
+        <div class="card-header">
+            Información de la Evaluación
+        </div>
+        <div class="card-body">
+            @if(Auth::user()->hasRole('ADMIN'))
+                <p><strong>Supervisor:</strong> {{ $evaluacion->asignacion->supervisor->Nombre ?? 'N/A' }}</p>
+            @endif
+            <p><strong>Docente:</strong> {{ $evaluacion->asignacion->docente->Nombre ?? 'N/A' }}</p>
+            <p><strong>Semestre:</strong> {{ $evaluacion->semestre->nombre_semestre ?? 'N/A' }}</p>
+            <p><strong>Tipo de Curso:</strong> {{ $evaluacion->tipo_curso }}</p>
+            <p><strong>Fecha de Evaluación:</strong> {{ \Carbon\Carbon::parse($evaluacion->fecha_evaluacion)->format('d/m/Y') }}</p>
+        </div>
     </div>
+
+    <h3>Detalles de la Evaluación</h3>
+    @if($evaluacion->detalles->isEmpty())
+        <p>No hay detalles registrados para esta evaluación.</p>
+    @else
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Criterio</th>
+                    <th>Cumple</th>
+                    <th>Comentarios</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($evaluacion->detalles as $detalle)
+                    <tr>
+                        <td>{{ $detalle->criterio->descripcion_criterio }}</td>
+                        <td>{{ $detalle->cumple ? 'Sí' : 'No' }}</td>
+                        <td>{{ $detalle->comentario }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+
+    <a href="{{ route('evaluaciones.index') }}" class="btn btn-secondary">Volver al Índice</a>
 </div>
 @endsection

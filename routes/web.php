@@ -67,17 +67,17 @@ Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
     Route::delete('/asignaciones/{id}', [AsignacionController::class, 'destroy'])->name('asignaciones.destroy');
 });
 
-Route::middleware(['auth', 'role:SUPERVISOR'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/supervisor/docentes', [AsignacionController::class, 'tusDocentes'])->name('supervisor.docentes');
     Route::controller(EvaluacionController::class)->group(function () {
-        Route::get('/evaluaciones', 'index')->name('evaluaciones.index');
-        Route::get('/evaluaciones/create', 'create')->name('evaluaciones.create'); // Usando /create en lugar de /crear
-        Route::post('/evaluaciones', 'store')->name('evaluaciones.store');
-        Route::get('/evaluaciones/{idAsignacion}', 'show')->name('evaluaciones.show');
-        Route::get('/evaluaciones/{idEvaluacion}/detail', 'detail')->name('evaluaciones.detail');
-        Route::delete('/evaluaciones/{idEvaluacion}', 'destroy')->name('evaluaciones.destroy');
-        Route::get('/evaluaciones/{idEvaluacion}/continuar', 'continueEvaluation')->name('evaluaciones.continue');
-        Route::post('/evaluaciones/continuar', 'storeContinuation')->name('evaluaciones.storeContinuation');
+    Route::get('/evaluaciones', 'index')->name('evaluaciones.index');
+    Route::get('/evaluaciones/create', 'create')->name('evaluaciones.create'); // Usando /create en lugar de /crear
+    Route::post('/evaluaciones', 'store')->name('evaluaciones.store');
+    Route::get('/evaluaciones/{idEvaluacion}', 'show')->name('evaluaciones.show');
+    Route::get('/evaluaciones/{idEvaluacion}/detail', 'detail')->name('evaluaciones.detail');
+    Route::delete('/evaluaciones/{idEvaluacion}', 'destroy')->name('evaluaciones.destroy');
+    Route::get('/evaluaciones/{idEvaluacion}/continuar', 'continueEvaluation')->name('evaluaciones.continue');
+    Route::post('/evaluaciones/continuar', 'storeContinuation')->name('evaluaciones.storeContinuation');
     });
 });
 

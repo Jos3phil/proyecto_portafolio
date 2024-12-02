@@ -5,6 +5,8 @@ namespace App\Providers;
 // use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Evaluacion;
+use App\Policies\EvaluacionPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -14,7 +16,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        //
+        Evaluacion::class => EvaluacionPolicy::class,
     ];
 
     /**
@@ -33,5 +35,13 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('supervisor-access', function ($user) {
             return $user->hasRole('SUPERVISOR');
         });   
+
+        Gate::define('docente-access', function ($user) {
+            return $user->hasRole('DOCENTE');
+        });
+            // Gate Compuesto para Evaluaciones
+        Gate::define('evaluaciones-access', function ( $user) {
+            return $user->hasAnyRole(['SUPERVISOR', 'ADMINISTRADOR']);
+        });
     }
 }

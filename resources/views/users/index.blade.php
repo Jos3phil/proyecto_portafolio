@@ -1,6 +1,6 @@
 <!-- resources/views/users/index.blade.php -->
 
-@extends('layouts.app')
+@extends('layouts.master')
 
 @section('content')
 <div class="container">

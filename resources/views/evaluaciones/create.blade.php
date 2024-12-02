@@ -10,12 +10,19 @@
     @include('partials.error')
     <!-- Comprobar si existe la variable $asignacion -->
     @if(isset($asignacion))
+        <p><strong>Docente:</strong> {{ $asignacion->docente->Nombre }}</p>
         <p><strong>Fecha Límite:</strong> {{ \Carbon\Carbon::parse($asignacion->semestre->fecha_fin)->format('d/m/Y') }}</p>
     @endif
     <!-- Formulario para seleccionar el tipo de curso -->
      
-    
-    <form method="GET" action="{{ route('evaluaciones.create') }}">
+    <!-- Información de la Asignación -->
+    <div class="mb-4">
+        
+        <p><strong>Email:</strong> {{ $asignacion->docente->email }}</p>
+        <p><strong>Semestre:</strong> {{ $asignacion->semestre->nombre_semestre }}</p>
+    </div>
+
+    <!-- <form method="GET" action="{{ route('evaluaciones.create') }}">
         <input type="hidden" name="id_asignacion" value="{{ $idAsignacion ?? old('id_asignacion') }}">
         <div class="form-group">
             <label for="tipo_curso">Tipo de Curso</label>
@@ -24,13 +31,22 @@
                 <option value="PRACTICA" {{ $tipoCurso == 'PRACTICA' ? 'selected' : '' }}>Práctica</option>
             </select>
         </div>
-    </form>
+    </form> -->
 
     <!-- Formulario para crear la evaluación -->
     <form method="POST" action="{{ route('evaluaciones.store') }}">
         @csrf
         <input type="hidden" name="id_asignacion" value="{{ $idAsignacion ?? old('id_asignacion') }}">
         <input type="hidden" name="tipo_curso" value="{{ $tipoCurso ?? old('tipo_curso') }}">
+        <!-- Selección del Tipo de Curso -->
+        <div class="form-group">
+            <label for="tipo_curso">Tipo de Curso</label>
+            <select name="tipo_curso" id="tipo_curso" class="form-control" required>
+                <option value="TEORIA" {{ old('tipo_curso') == 'TEORIA' ? 'selected' : '' }}>Teoría</option>
+                <option value="PRACTICA" {{ old('tipo_curso') == 'PRACTICA' ? 'selected' : '' }}>Práctica</option>
+               
+            </select>
+        </div>
 
         @foreach($criterios as $nombreSeccion => $criteriosSeccion)
             <h3>{{ $nombreSeccion }}</h3>

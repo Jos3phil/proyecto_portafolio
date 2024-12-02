@@ -8,10 +8,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
-{
+{ 
     use HasApiTokens, HasFactory, Notifiable;
+    
+    
 
     protected $table = 'TUsuario';
     /**
@@ -111,7 +114,7 @@ class User extends Authenticatable
      */
     public function asignaciones()
     {
-        return $this->hasMany(Asignacion::class, 'supervisor_id', 'id_usuario');
+        return $this->hasOne(Asignacion::class, 'id_supervisor', 'id_usuario');
     }
     /**
      * Relación muchos a través con User (docentes asignados)

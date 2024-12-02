@@ -338,7 +338,13 @@ return [
             'text' => 'Evaluaciones',
             'url'  => '/evaluaciones',
             'icon' => 'fas fa-fw fa-lock',
-            'can'  => 'supervisor-access', // Opcional: Mostrar solo para supervisores
+           'can'  => 'evaluaciones-access', // Opcional: Mostrar solo para supervisores
+        ],
+        [
+            'text' => 'Mis Evaluaciones',
+            'url'  => '/evaluaciones',
+            'icon' => 'fas fa-fw fa-eye',
+            'can'  => 'docente-access',
         ],
         [
             'text' => 'Criterios de Evaluación',
@@ -363,7 +369,13 @@ return [
             'url'  => '/users',
             'icon' => 'fas fa-calendar-alt',
             'can'  => 'admin-access',
-        ],      
+        ], 
+        [
+            'text' => 'Docentes asignados',
+            'url'  => '/supervisor/docentes',
+            'icon' => 'fas fa-calendar-alt',
+            'can'  => 'supervisor-access',
+        ], 
         [
             'text' => 'multilevel',
             'icon' => 'fas fa-fw fa-share',
@@ -440,6 +452,7 @@ return [
         JeroenNoten\LaravelAdminLte\Menu\Filters\ClassesFilter::class,
         JeroenNoten\LaravelAdminLte\Menu\Filters\LangFilter::class,
         JeroenNoten\LaravelAdminLte\Menu\Filters\DataFilter::class,
+        JeroenNoten\LaravelAdminLte\Menu\Filters\GateFilter::class,
     ],
 
     /*

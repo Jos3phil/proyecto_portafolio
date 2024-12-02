@@ -106,10 +106,12 @@ class AsignacionController extends Controller
             abort(403, 'No tienes permisos para acceder a esta página.');
         }
 
-        // Obtener los docentes asignados
-        $docentes = $supervisor->docentesAsignados()->with('roles')->get();
+        // Obtener las asignaciones del supervisor con la información del docente
+        $asignaciones = Asignacion::with('docente')
+        ->where('id_supervisor', $supervisor->id_usuario)
+        ->get();
 
-        return view('asignaciones.tus_docentes', compact('docentes'));
+    return view('asignaciones.tus_docentes', compact('asignaciones'));
     }
     public function destroy($id)
     {

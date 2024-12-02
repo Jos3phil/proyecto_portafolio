@@ -1,10 +1,12 @@
 <!-- resources/views/asignaciones/tus_docentes.blade.php -->
 
-@extends('layouts.app')
+@extends('layouts.master')
+@section('content_header')
+    <h1>@yield('page_title', 'Docentes Asignados')</h1>
+@stop
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">Tus Docentes Asignados</h1>
 
     @if(session('mensaje'))
         <div class="alert alert-success">
@@ -12,37 +14,37 @@
         </div>
     @endif
 
-    @if($docentes->isEmpty())
-        <div class="alert alert-info">
-            No tienes docentes asignados.
-        </div>
+    @if($asignaciones->isEmpty())
+        <p>No tienes docentes asignados.</p>
     @else
         <table class="table table-bordered">
             <thead>
                 <tr>
+                    <th>ID Asignación</th>
                     <th>ID Docente</th>
                     <th>Nombre</th>
                     <th>Email</th>
-                    <th>Roles</th>
+                    <th>Acciones</th>
                     <!-- Agrega más columnas si es necesario -->
                 </tr>
             </thead>
             <tbody>
-                @foreach($docentes as $docente)
+                @foreach($asignaciones as $asignacion)
                     <tr>
-                        <td>{{ $docente->id_usuario }}</td>
-                        <td>{{ $docente->Nombre }}</td>
-                        <td>{{ $docente->email }}</td>
+                        <td>{{ $asignacion->id_asignacion }}</td>
+                        <td>{{ $asignacion->docente->id_usuario }}</td>
+                        <td>{{ $asignacion->docente->Nombre }}</td>
+                        <td>{{ $asignacion->docente->email }}</td>
                         <td>
-                            @foreach($docente->roles as $role)
-                                <span class="badge bg-primary">{{ $role->tipo_rol }}</span>
-                            @endforeach
+                            <a href="{{ route('evaluaciones.create', ['id_asignacion' => $asignacion->id_asignacion]) }}" class="btn btn-success btn-sm">
+                                Crear Evaluación
+                            </a>
                         </td>
-                        <!-- Agrega más celdas si es necesario -->
                     </tr>
                 @endforeach
             </tbody>
         </table>
     @endif
 </div>
+
 @endsection

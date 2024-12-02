@@ -22,4 +22,5 @@ class SeccionEvaluacion extends Model
     {
         return $this->hasMany(CriterioEvaluacion::class, 'id_seccion', 'id_seccion');
     }
+    
 }

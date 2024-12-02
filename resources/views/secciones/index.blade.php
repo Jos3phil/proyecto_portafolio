@@ -18,6 +18,7 @@
                     <th>Nombre</th>
                     <th>Descripción</th>
                     <th>Obligatoriedad</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,6 +27,16 @@
                         <td>{{ $seccion->nombre_seccion }}</td>
                         <td>{{ $seccion->descripcion_seccion }}</td>
                         <td>{{ $seccion->obligatoriedad ? 'Obligatoria' : 'Opcional' }}</td>
+                        <td>
+                            <a href="{{ route('secciones.edit', $seccion->id_seccion) }}" class="btn btn-primary btn-sm">Editar</a>
+                                
+                            <form action="{{ route('secciones.destroy', $seccion->id_seccion) }}" method="POST" style="display:inline-block;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta sección?');">Eliminar</button>
+                            </form>
+                        </td>
+                        
                     </tr>
                 @endforeach
             </tbody>
