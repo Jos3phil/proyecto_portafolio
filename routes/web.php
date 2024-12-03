@@ -91,9 +91,7 @@ Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
-    Route::get('/secciones/create', [SeccionEvaluacionController::class, 'create'])->name('secciones.create');
-    Route::post('/secciones', [SeccionEvaluacionController::class, 'store'])->name('secciones.store');
-    Route::get('/secciones', [SeccionEvaluacionController::class, 'index'])->name('secciones.index');
+    Route::resource('secciones', SeccionEvaluacionController::class);
 });
 
 
@@ -104,7 +102,7 @@ Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
 });
 
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/roles/switch', [RoleController::class, 'switchRole'])->name('roles.switch');
-    Route::post('/roles/switch', [RoleController::class, 'setActiveRole'])->name('roles.setActive');
-});
+// Route::middleware(['auth'])->group(function () {
+//     Route::get('/roles/switch', [RoleController::class, 'switchRole'])->name('roles.switch');
+//     Route::post('/roles/switch', [RoleController::class, 'setActiveRole'])->name('roles.setActive');
+// });

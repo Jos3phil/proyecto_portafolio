@@ -415,7 +415,7 @@ class EvaluacionController extends Controller
 
         $asignacion = $evaluacionAnterior->asignacion;
          // Verificar permisos según rol
-        if ($user->hasRole('SUPERVISOR') && $asignacion->supervisor_id !== $user->id_usuario) {
+        if ($user->hasRole('SUPERVISOR') && $asignacion->id_supervisor !== $user->id_usuario) {
             abort(403, 'No tienes permisos para continuar esta evaluación.');
         }
         $idSemestre = $asignacion->id_semestre;
