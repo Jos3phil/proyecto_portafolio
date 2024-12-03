@@ -57,7 +57,7 @@ class EvaluacionPolicy
      */
     public function delete(User $user, Evaluacion $evaluacion): bool
     {
-        //
+        return $user->hasRole('ADMINISTRADOR');
     }
 
     /**

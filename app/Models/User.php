@@ -99,12 +99,23 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'TUsuarioRoles', 'id_usuario', 'id_rol')
                     ->withPivot('id_usuario_rol')
                     ->withTimestamps();
-    }   
+    }  
+    /**
+     * Verifica si el usuario tiene un rol específico.
+     *
+     * @param string $roleType
+     * @return bool
+     */
     public function hasRole($roleType)
     {
         return $this->roles()->where('tipo_rol', $roleType)->exists();
     }
-
+    /**
+     * Verifica si el usuario tiene alguno de los roles especificados.
+     *
+     * @param array $roles
+     * @return bool
+     */
     public function hasAnyRole($roles)
     {
         return $this->roles()->whereIn('tipo_rol', $roles)->exists();
@@ -123,5 +134,26 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(User::class, Asignacion::class, 'id_supervisor', 'id_usuario', 'id_usuario', 'id_docente');
     }
+     /**
+     * Establece el rol activo en la sesión.
+     *
+     * @param string $role
+     * @return void
+     */
+    public function setActiveRole($role)
+    {
+        if ($this->hasRole($role)) {
+            session(['active_role' => $role]);
+        }
+    }
 
+    /**
+     * Obtiene el rol activo desde la sesión.
+     *
+     * @return string|null
+     */
+    public function getActiveRole()
+    {
+        return session('active_role');
+    }
 }

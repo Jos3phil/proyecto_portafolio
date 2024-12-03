@@ -375,7 +375,13 @@ return [
             'url'  => '/supervisor/docentes',
             'icon' => 'fas fa-calendar-alt',
             'can'  => 'supervisor-access',
-        ], 
+        ],
+        [
+            'text' => 'Cambiar Rol',
+            'url'  => '/roles/switch',
+            'icon' => 'fas fa-fw fa-exchange-alt',
+            'can'  => 'authenticated', // Mostrar para usuarios autenticados
+        ],
         [
             'text' => 'multilevel',
             'icon' => 'fas fa-fw fa-share',

@@ -83,6 +83,7 @@ class EvaluacionController extends Controller
         $user = Auth::User();
         // Depuración: Verificar roles
         //dd($user->roles->pluck('tipo_rol'));
+
         if ($user->hasRole('ADMINISTRADOR')) {
             // Administrador: ver todas las evaluaciones
             $evaluaciones = Evaluacion::all();
@@ -539,11 +540,11 @@ class EvaluacionController extends Controller
         // Obtener la evaluación
         $evaluacion = Evaluacion::with('asignacion')->findOrFail($idEvaluacion);
         // Verificar permisos según rol
-        if ($user->hasRole('ADMIN')) {
+        if ($user->hasRole('ADMINISTRADOR')) {
             // Administrador puede eliminar cualquier evaluación
         } elseif ($user->hasRole('SUPERVISOR')) {
             // Supervisor solo puede eliminar evaluaciones de sus docentes asignados
-            if ($evaluacion->asignacion->supervisor_id !== $user->id_usuario) {
+            if ($evaluacion->asignacion->id_supervisor !== $user->id_usuario) {
                 abort(403, 'No tienes permisos para eliminar esta evaluación.');
             }
         } else {

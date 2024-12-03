@@ -102,3 +102,9 @@ Route::middleware(['auth', 'role:ADMINISTRADOR'])->group(function () {
     Route::post('/semestres', [SemestreController::class, 'store'])->name('semestres.store');
     Route::get('/semestres', [SemestreController::class, 'index'])->name('semestres.index');
 });
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/roles/switch', [RoleController::class, 'switchRole'])->name('roles.switch');
+    Route::post('/roles/switch', [RoleController::class, 'setActiveRole'])->name('roles.setActive');
+});
